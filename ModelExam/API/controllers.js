@@ -3,7 +3,7 @@ const tableUser = require('./models');
 
 const users = async (req, res) => {
     const dataFound = await tableUser.findAll({ attributes: { exclude: ['password'] } });
-    res.status(200).send(dataFound.json());
+    res.status(200).send(dataFound);
 };
 
 const login = async (req, res) => {
@@ -17,7 +17,7 @@ const login = async (req, res) => {
         !emailExist ?? res.status(404).send('No existe una cuenta vinculada con el correo electrónico');
 
         bcrypt.compare(password, userFound.password, (err, result) => {
-            err ?? console.log('Error comparando las contraseñas');
+            err ?? console.log(`Error comparando las contraseñas: ${err}`);
             result ? console.log('Las contraseñas coinciden') : console.log('No coinciden las contraseñas');
         });
     } catch (error) {
@@ -28,24 +28,18 @@ const login = async (req, res) => {
 const register = async (req, res) => {
     try {
         const { firstname, lastname, email, username, password } = req.body;
-
         let passwordInput = password;
-        let passwordHashed;
-
-        bcrypt.hash(passwordInput, 10, (err, hash) => {
-            err ?? console.log(`Error al hashear la contraseña: ${err}`);
-            passwordHashed = hash;
-        });
-
-        const userCreated = tableUser.create({
+        const passwordHashed = await bcrypt.hash(passwordInput, 10);
+        console.log(passwordHashed);
+        const userCreated = await tableUser.create({
             firstname: firstname,
             lastname: lastname,
             email: email,
             username: username,
             password: passwordHashed
         });
-
-        res.status(201).send(`usuario creado ;D`);
+        
+        if (userCreated) res.status(201).send(`usuario creado ;D`); 
     } catch (error) {
         console.log(`error: ${error}`);
     }
