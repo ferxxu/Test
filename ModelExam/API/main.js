@@ -17,4 +17,5 @@ app.get('/', users);
 app.post('/register', register);
 app.post('/login', login);
 
+tableUsers.sync({force:false});
 app.listen(3000, () => {console.log('Corriendo en el puerto: 3000')});
