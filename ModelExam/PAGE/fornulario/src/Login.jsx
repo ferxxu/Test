@@ -36,18 +36,20 @@ export default function Login() {
 
   let handleForm = async (e) => {
     e.preventDefault();
+    const token = localStorage.getItem('authToken');
     if (verifyEmail(form.email)) {
-      const response = await fetch("http://localhost:3000/login", {
+      const response = await fetch("http://localhost:3000/login/", {
         method: "POST",
         body: JSON.stringify({
           email: form.email,
           password: form.password,
         }),
-        headers: { "Content-Type": "application/json" },
+        headers: { "Content-Type": "application/json", "Authorization": `${token}`},
       });
-      if (response.status == "404") alert(`No tenemos registros del correo: ${form.email}, porfavor considere registrarse.`);
-      if (response.status == "401") alert(`Contraseña incorrecta.`);
-      if (response.status == "200") alert(`¡Tu contraseña y correo son correctos!`);
+      const data = await response.json();
+      if (data.status == "404") alert(`No tenemos registros del correo: ${form.email}, porfavor considere registrarse.`);
+      if (data.status == "401") alert(`Contraseña incorrecta.`);
+      if (data.status == "200") alert(`¡Tu contraseña y correo son correctos!`);
     }
   };
   return (

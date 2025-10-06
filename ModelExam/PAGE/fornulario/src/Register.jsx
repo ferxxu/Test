@@ -1,5 +1,6 @@
 import { TextField, Button } from "@mui/material";
 import { useState } from "react";
+
 export default function Register() {
   const [Form, setForm] = useState({
     userName: "",
@@ -59,11 +60,15 @@ export default function Register() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
       });
-      if (response.status != "201")
-        console.error(`Usuario no creado: ${response}`);
-      else alert("¡Registro exitoso!");
-    }
-    else alert('¡Ingrese un correo válido!');
+      let dataParsed = await response.json();
+
+      if (dataParsed.status != "201") {
+        console.error(`Error al crear el usuario`);
+      } else {
+        alert("¡Registro exitoso!");
+        localStorage.setItem("authToken", dataParsed.tokenCreated);
+      }
+    } else alert("¡Ingrese un correo válido!");
   };
   return (
     <div className="register-form">
