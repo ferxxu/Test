@@ -1,6 +1,6 @@
 const express = require('express');
 const {validateUser} = require('./middlewares');
-const {users, register, login} = require('./controllers');
+const {users, register, login, userLoged} = require('./controllers');
 const tableUsers = require('./models');
 const app = express();
 const dotenv = require('dotenv');
@@ -17,7 +17,8 @@ app.use((_req, res, next) => {
 
 app.get('/', users);    
 app.post('/register', register);
-app.post('/login', validateUser, login);
+app.post('/login', login);
+app.get('/dashboard', validateUser, userLoged)
 
 tableUsers.sync({force:true});
 app.listen(process.env.PORT, () => {console.log('Servidor iniciado en el puerto correspondiente')});

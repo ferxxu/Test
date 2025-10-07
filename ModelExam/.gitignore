@@ -1,4 +1,3 @@
-#ignorando las siguientes carpetas y archivos:
 **/node_modules/
 
 API/.env

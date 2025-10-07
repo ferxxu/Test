@@ -1,3 +1,4 @@
+import { data, Link } from "react-router-dom";
 import { TextField, Button } from "@mui/material";
 import { useState } from "react";
 
@@ -60,18 +61,17 @@ export default function Register() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
       });
-      let dataParsed = await response.json();
-
-      if (dataParsed.status != "201") {
+      if (response.status != "201") {
         console.error(`Error al crear el usuario`);
       } else {
         alert("¡Registro exitoso!");
-        localStorage.setItem("authToken", dataParsed.tokenCreated);
       }
     } else alert("¡Ingrese un correo válido!");
   };
   return (
     <div className="register-form">
+      <h2>Registrate @_@</h2>
+      <Link to="/login">Ya tenes una cuenta? logeate aca</Link>
       <form onSubmit={handleForm}>
         <TextField
           required

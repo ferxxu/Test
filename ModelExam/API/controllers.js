@@ -1,8 +1,8 @@
-const jwt = require('jsonwebtoken');
+const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const tableUser = require("./models");
-const { text } = require('body-parser');
-require('dotenv').config();
+const { text } = require("body-parser");
+require("dotenv").config();
 
 const users = async (req, res) => {
   const dataFound = await tableUser.findAll({
@@ -17,16 +17,25 @@ const login = async (req, res) => {
     const userFound = await tableUser.findAll({
       where: { email: email },
     });
-    
-    if (userFound != ''){
-    let passwordComparation = await bcrypt.compare(
-      password,
-      userFound[0].dataValues.password
-    );
-    passwordComparation;
-    if (!passwordComparation) res.status(401).send();
-    if (passwordComparation) res.status(200).send();
-
+    if (userFound != "") {
+      let passwordComparation = await bcrypt.compare(
+        password,
+        userFound[0].dataValues.password
+      );
+      passwordComparation;
+      if (!passwordComparation) res.status(401).send();
+      const token = jwt.sign(
+        {
+          user_id:  userFound[0].dataValues.id,
+          user_username:  userFound[0].dataValues.username,
+        },
+        process.env.SECRET_KEY,
+        {
+          expiresIn: "5m",
+          algorithm: "HS256",
+        }
+      );
+      if (passwordComparation) res.json({ status: 200, message: "Credenciales válidas", tokenCreated: token });
     } else res.status(404).send();
   } catch (err) {
     console.error(`algo pasó: ${err}`);
@@ -44,21 +53,17 @@ const register = async (req, res) => {
       email: email,
       username: username,
       password: passwordHashed,
-    });    
-    const token = jwt.sign(
-      {
-      user_id: userCreated['dataValues'].id, 
-      user_username: userCreated['dataValues'].username,
-    },
-    process.env.SECRET_KEY, 
-    {
-      expiresIn: "5m",
-      algorithm: "HS256"
     });
-    res.json({status: 201, message:'User created', tokenCreated: token});
+    if (userCreated) res.status(201).send();
   } catch (error) {
     console.log(`error: ${error}`);
   }
 };
 
-module.exports = { users, register, login };
+const userLoged = async (req, res) => {
+  const tokenData = req.user;
+  const dataFound = await tableUser.findByPk(tokenData.user_id);
+  if (dataFound) res.status(200).send(dataFound);
+}
+
+module.exports = { users, register, login, userLoged };
