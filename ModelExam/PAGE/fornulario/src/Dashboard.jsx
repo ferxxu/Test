@@ -5,7 +5,8 @@ export default function Dashboard() {
     username: "",
     firstname: "",
     lastname: "",
-    email: ""
+    email: "",
+    admin: false,
   });
   const token = localStorage.getItem("authToken");
   useEffect(() => {
@@ -18,7 +19,13 @@ export default function Dashboard() {
         },
       });
       const dataFound = await response.json();
-      setData({ username: `${dataFound.username}`, firstname: `${dataFound.firstname}`, lastname: `${dataFound.lastname}`, email: `${dataFound.email}`});
+      setData({...data, 
+        username: `${dataFound.username}`,
+        firstname: `${dataFound.firstname}`,
+        lastname: `${dataFound.lastname}`,
+        email: `${dataFound.email}`,
+        admin: dataFound.admin
+      });
     };
     getData();
   }, []);
@@ -26,9 +33,14 @@ export default function Dashboard() {
     localStorage.removeItem("authToken");
     window.location.href = "http://localhost:5173/";
   };
+  function Status({isAdmin}){
+    if (isAdmin) return <h1>Usted ha ingresado como administrador</h1>;
+    if (!isAdmin) return <h1>Usted es un simple usuario</h1>
+  }
   return (
     <div className="Info-Container">
       <h1>Bienvenido: {data.username}</h1>
+      <Status isAdmin={data.admin}/>
       <button onClick={handleLogOut}>Cerrar sesión</button>
     </div>
   );

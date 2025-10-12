@@ -1,5 +1,5 @@
 const express = require('express');
-const {validateUser} = require('./middlewares');
+const {validateUser, isAdministrator} = require('./middlewares');
 const {users, register, login, userLoged} = require('./controllers');
 const tableUsers = require('./models');
 const app = express();
@@ -15,10 +15,10 @@ app.use((_req, res, next) => {
     next();
 });
 
-app.get('/', users);    
 app.post('/register', register);
 app.post('/login', login);
-app.get('/dashboard', validateUser, userLoged)
+app.get('/', users);
+app.get('/dashboard', validateUser, userLoged);
 
 tableUsers.sync({force:true});
 app.listen(process.env.PORT, () => {console.log('Servidor iniciado en el puerto correspondiente')});
